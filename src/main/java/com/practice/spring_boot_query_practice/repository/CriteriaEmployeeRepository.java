@@ -1,6 +1,7 @@
 package com.practice.spring_boot_query_practice.repository;
 
 import com.practice.spring_boot_query_practice.entity.DepartmentEntity;
+import com.practice.spring_boot_query_practice.entity.Employee;
 import com.practice.spring_boot_query_practice.entity.EmployeeEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -22,28 +23,28 @@ public class CriteriaEmployeeRepository {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public List<EmployeeEntity> getAllEmployee() {
+    public List<Employee> getAllEmployee() {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<EmployeeEntity> query = cb.createQuery(EmployeeEntity.class);
-        Root<EmployeeEntity> root = query.from(EmployeeEntity.class);
+        CriteriaQuery<Employee> query = cb.createQuery(Employee.class);
+        Root<Employee> root = query.from(Employee.class);
 
         query.select(root);
         return entityManager.createQuery(query).getResultList();
     }
 
-    public List<EmployeeEntity> getAllEmployeeByName(String department) {
+    public List<Employee> getAllEmployeeByName(String department) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<EmployeeEntity> query = cb.createQuery(EmployeeEntity.class);
-        Root<EmployeeEntity> root = query.from(EmployeeEntity.class);
+        CriteriaQuery<Employee> query = cb.createQuery(Employee.class);
+        Root<Employee> root = query.from(Employee.class);
 
         query.select(root).where(cb.equal(root.get("name"), department));
         return entityManager.createQuery(query).getResultList();
     }
 
-    public List<EmployeeEntity> getAllEmployeesByName(String department, String minSalary) {
+    public List<Employee> getAllEmployeesByName(String department, Integer minSalary) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<EmployeeEntity> query = criteriaBuilder.createQuery(EmployeeEntity.class);
-        Root<EmployeeEntity> root = query.from(EmployeeEntity.class);
+        CriteriaQuery<Employee> query = criteriaBuilder.createQuery(Employee.class);
+        Root<Employee> root = query.from(Employee.class);
         Predicate predicate = criteriaBuilder.greaterThanOrEqualTo(root.get("salary"), minSalary);
         query.select(root).where(
                 criteriaBuilder.and(
@@ -54,33 +55,34 @@ public class CriteriaEmployeeRepository {
         return entityManager.createQuery(query).getResultList();
     }
 
-    public List<EmployeeEntity> getAllEmployeeSortedBySalary() {
+    public List<Employee> getAllEmployeeSortedBySalary() {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<EmployeeEntity> query = cb.createQuery(EmployeeEntity.class);
-        Root<EmployeeEntity> root = query.from(EmployeeEntity.class);
+        CriteriaQuery<Employee> query = cb.createQuery(Employee.class);
+        Root<Employee> root = query.from(Employee.class);
 
         query.select(root).orderBy(cb.desc(root.get("salary")));
         return entityManager.createQuery(query).getResultList();
     }
 
-    public List<EmployeeEntity> getAllEmployeeSortedByName() {
+    public List<Employee> getAllEmployeeSortedByName() {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<EmployeeEntity> criteriaQuery = criteriaBuilder.createQuery(EmployeeEntity.class);
-        Root<EmployeeEntity> root = criteriaQuery.from(EmployeeEntity.class);
+        CriteriaQuery<Employee> criteriaQuery = criteriaBuilder.createQuery(Employee.class);
+        Root<Employee> root = criteriaQuery.from(Employee.class);
 
         criteriaQuery.select(root).orderBy(criteriaBuilder.desc(root.get("name")));
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
 
-    public List<EmployeeEntity> getAllEmployeeInPaginatedForm(Integer pageNumber, Integer size) {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<EmployeeEntity> query = criteriaBuilder.createQuery(EmployeeEntity.class);
-        Root<EmployeeEntity> root = query.from(EmployeeEntity.class);
+        public List<Employee> getAllEmployeeInPaginatedForm(Integer pageNumber, Integer size) {
+            pageNumber-=pageNumber;
+            CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+            CriteriaQuery<Employee> query = criteriaBuilder.createQuery(Employee.class);
+            Root<Employee> root = query.from(Employee.class);
 
-        query.select(root);
-        return entityManager.createQuery(query)
-                .setFirstResult(pageNumber)
-                .setMaxResults(size).getResultList();
+            query.select(root);
+            return entityManager.createQuery(query)
+                    .setFirstResult(pageNumber)
+                    .setMaxResults(size).getResultList();
     }
 
     public List<EmployeeEntity> getAllEmployeesByDepartmentName(String departmentName) {
@@ -97,7 +99,7 @@ public class CriteriaEmployeeRepository {
     public Long getAllEmployeeByName() {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> query = cb.createQuery(Long.class);
-        Root<EmployeeEntity> root = query.from(EmployeeEntity.class);
+        Root<Employee> root = query.from(Employee.class);
 
         query.select(cb.countDistinct(root.get("name")));
         return entityManager.createQuery(query).getSingleResult();
@@ -106,7 +108,7 @@ public class CriteriaEmployeeRepository {
     public Integer getHighestPaidEmployee() {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Integer> query = cb.createQuery(Integer.class);
-        Root<EmployeeEntity> root = query.from(EmployeeEntity.class);
+        Root<Employee> root = query.from(Employee.class);
 
         query.select(cb.max(root.get("salary")));
         return entityManager.createQuery(query).getSingleResult();
@@ -126,13 +128,13 @@ public class CriteriaEmployeeRepository {
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
 
-    public List<EmployeeEntity> getEmployeeAboveAverageSalary() {
+    public List<Employee> getEmployeeAboveAverageSalary() {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<EmployeeEntity> query = criteriaBuilder.createQuery(EmployeeEntity.class);
-        Root<EmployeeEntity> root = query.from(EmployeeEntity.class);
+        CriteriaQuery<Employee> query = criteriaBuilder.createQuery(Employee.class);
+        Root<Employee> root = query.from(Employee.class);
 
         Subquery<Double> subquery = query.subquery(Double.class);
-        Root<EmployeeEntity> rootSubQuery = subquery.from(EmployeeEntity.class);
+        Root<Employee> rootSubQuery = subquery.from(Employee.class);
         subquery.select(criteriaBuilder.avg(rootSubQuery.get("salary")));
 
 
@@ -142,10 +144,10 @@ public class CriteriaEmployeeRepository {
         return entityManager.createQuery(query).getResultList();
     }
 
-    public List<EmployeeEntity> getEmployeeWithDynamicQuery(String name, Integer salary) {
+    public List<Employee> getEmployeeWithDynamicQuery(String name, Integer salary) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<EmployeeEntity> query = criteriaBuilder.createQuery(EmployeeEntity.class);
-        Root<EmployeeEntity> root = query.from(EmployeeEntity.class);
+        CriteriaQuery<Employee> query = criteriaBuilder.createQuery(Employee.class);
+        Root<Employee> root = query.from(Employee.class);
         List<Predicate> predicates = new ArrayList<>();
         if (StringUtils.isNotBlank(name)) {
             predicates.add(criteriaBuilder.like(root.get("name"), "%" + name + "%"));
